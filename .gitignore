@@ -1,4 +1,7 @@
 /sample_assignments 
+*/datamart
+/.Trash-0
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
