@@ -1,0 +1,33 @@
+================================================================================
+MODEL MONITORING REPORT
+Generated: 2025-11-09 13:04:15
+================================================================================
+
+1. LATEST PERFORMANCE METRICS
+   Date: 2024-12-01 00:00:00
+   AUC: 0.8440
+   F1 Score: 0.6070
+   Precision: 0.7647
+   Recall: 0.5032
+
+   Performance Change:
+   AUC Change: +0.0000
+
+2. FEATURE DRIFT ANALYSIS
+   Total Features: 61
+   High Drift: 4
+   Medium Drift: 0
+   Low Drift: 57
+
+   ⚠️ Features with High Drift:
+   - Annual_Income: PSI = 0.3245
+   - Total_EMI_per_month: PSI = 0.2593
+   - Debt_to_Monthly_Income_Ratio: PSI = 0.3550
+   - fe_1: PSI = 0.3210
+
+3. PREDICTION STABILITY
+   Mean Probability: 0.2878
+   Std Probability: 0.1899
+   Prediction Rate: 20.48%
+
+================================================================================
