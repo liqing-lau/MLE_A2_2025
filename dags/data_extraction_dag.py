@@ -37,7 +37,7 @@ dag = DAG(
     'data_extraction_pipeline',
     default_args=default_args,
     description='Process data through bronze, silver, and gold layers',
-    schedule_interval='0 0 1 * *',  # Run on 1st of every month at Midnight
+    schedule_interval= "@monthly",
     start_date=datetime(2023, 1, 1),
     catchup=True,  # Process historical dates
     max_active_runs=1
