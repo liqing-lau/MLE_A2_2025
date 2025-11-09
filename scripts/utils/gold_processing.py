@@ -219,6 +219,9 @@ def process_gold_feature_label_table(snapshot_date_str, silver_dir, gold_dir, sp
     print(f"Rows before temporal filter: {label_df.count()}")
     print(f"Rows after temporal filter: {validated_join.count()}")
     
+    if validated_join.count() == 0: 
+        return None
+
     # 1. Label Store (Y) - loan_id, Customer_ID, label, label_def, snapshot_date
     label_store = validated_join.select("loan_id", "Customer_ID", "label", "snapshot_date")
     label_filepath = gold_dir + "label_store/gold_label_"+ snapshot_date_str.replace('-','_') + ".parquet"
