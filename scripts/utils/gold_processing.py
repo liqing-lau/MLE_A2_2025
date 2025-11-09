@@ -141,7 +141,7 @@ def process_gold_finanical_table(silver_dir, gold_dir, spark):
                  'Payment_Value', 'Loan_Array', 'Monthly_Income_Level', 'Num_Credit_Card_typo',
                 "Num_of_Loan_typo", "Interest_Rate_typo", 'Num_of_Delayed_Payment_typo', 'Num_Credit_Inquiries_typo',
                 'Negative_Delay_from_due_date', 'Delay_from_due_date', "Payment_of_Min_Amount_clean",
-                'Payment_Value')
+                'Payment_Value', 'not specified')
 
     # save gold table - IRL connect to database to write
     filepath = gold_dir + "gold_feature_financials.parquet"
@@ -206,10 +206,9 @@ def process_gold_feature_label_table(snapshot_date_str, silver_dir, gold_dir, sp
 
     # get label
     df = df.withColumn("label", F.when(col("dpd") >= dpd, 1).otherwise(0).cast(IntegerType()))
-    df = df.withColumn("label_def", F.lit(str(dpd)+'dpd_'+str(mob)+'mob').cast(StringType()))
 
     # select columns for label table
-    label_df = df.select("loan_id", "Customer_ID", "label", "label_def", "snapshot_date")
+    label_df = df.select("loan_id", "Customer_ID", "label", "snapshot_date")
 
     # TEMPORAL VALIDATION: Ensure features are not from the future relative to loan data
     # Join with temporal check - feature_snapshot_date must be <= loan snapshot_date
@@ -221,7 +220,7 @@ def process_gold_feature_label_table(snapshot_date_str, silver_dir, gold_dir, sp
     print(f"Rows after temporal filter: {validated_join.count()}")
     
     # 1. Label Store (Y) - loan_id, Customer_ID, label, label_def, snapshot_date
-    label_store = validated_join.select("loan_id", "Customer_ID", "label", "label_def", "snapshot_date")
+    label_store = validated_join.select("loan_id", "Customer_ID", "label", "snapshot_date")
     label_filepath = gold_dir + "label_store/gold_label_"+ snapshot_date_str.replace('-','_') + ".parquet"
     label_store.write.mode("overwrite").parquet(label_filepath)
     print(f'Label store saved to: {label_filepath}, row count: {label_store.count()}')

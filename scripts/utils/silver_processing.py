@@ -251,14 +251,30 @@ def process_silver_financial_table(bronze_dir, silver_dir, spark):
 
     # create array for loan types and remove not specified if there are other values in the array
     df = df.withColumn("Loan_Array", F.split(F.col("Type_of_Loan"), ","))
-    df = df.withColumn("Loan_Array", F.expr("transform(Loan_Array, x -> trim(x))"))
-    df = df.withColumn("Loan_Array",F.expr("""
-                                            CASE 
-                                                WHEN size(Loan_Array) > 1 
-                                                THEN filter(Loan_Array, x -> x != 'not specified') 
-                                                ELSE Loan_Array 
-                                            END
-                                        """))
+
+    # Trim and normalize case
+    df = df.withColumn("Loan_Array", F.expr("transform(Loan_Array, x -> lower(trim(x)))"))
+    
+    # Remove NULL/empty entries
+    df = df.withColumn("Loan_Array", F.expr("filter(Loan_Array, x -> x IS NOT NULL AND x <> '')"))
+    
+    # Remove 'not specified' only when there are other valid values
+    df = df.withColumn(
+        "Loan_Array",
+        F.expr("""
+            CASE 
+                WHEN size(Loan_Array) > 1 THEN filter(Loan_Array, x -> x <> 'not specified')
+                ELSE Loan_Array
+            END
+        """)
+    )
+    
+    # Fill back empty arrays with ['not specified']
+    df = df.withColumn(
+        "Loan_Array",
+        F.when(F.size("Loan_Array") == 0, F.array(F.lit("not specified")).cast("array<string>"))
+         .otherwise(F.col("Loan_Array"))
+    )
     
     if not os.path.exists(silver_dir):
         os.makedirs(silver_dir)
